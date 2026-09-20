@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { LogOut, User, Trash2 } from 'lucide-react';
+import logo from '../assets/logo.png';
 
 export const Navbar = ({ onNavigateTab }) => {
   const { user, logout } = useAuth();
@@ -10,20 +11,17 @@ export const Navbar = ({ onNavigateTab }) => {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
+    <header className="bg-green-100/40 backdrop-blur-md border-b border-green-200/50 sticky top-0 z-30 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Logo Brand Button */}
           <button 
             onClick={() => onNavigateTab?.('dashboard')}
-            className="flex items-center space-x-2 text-green-600 hover:text-green-700 transition focus:outline-none"
+            className="flex items-center space-x-2 hover:opacity-90 transition focus:outline-none"
           >
-            <Trash2 className="h-8 w-8" />
+            <img src={logo} alt="Smart Waste Monitor Logo" className="h-8 w-8 object-contain" />
             <span className="font-bold text-xl tracking-tight text-gray-900">
-              Smart<span className="text-green-600">Waste</span>
-            </span>
-            <span className="text-[10px] uppercase bg-green-100 text-green-800 font-bold px-2 py-0.5 rounded-full tracking-wider hidden sm:inline-block">
-              Campus Monitor
+              Smart Waste <span className="text-green-600">Monitor</span>
             </span>
           </button>
 

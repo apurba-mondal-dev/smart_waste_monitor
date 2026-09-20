@@ -84,7 +84,15 @@ export const AuthProvider = ({ children }) => {
         
         // Simple mock credential check (passwords: admin123 and staff123)
         if (found) {
-          const expectedPassword = found.role === 'admin' ? 'admin123' : 'staff123';
+          // New members created by admin have their password stored directly.
+          // Seed accounts (admin@campus.edu / staff@campus.edu) use the legacy defaults.
+          const expectedPassword =
+            found.password
+              ? found.password
+              : found.role === 'admin'
+              ? 'admin123'
+              : 'staff123';
+
           if (password === expectedPassword) {
             setUser(found);
             sessionStorage.setItem('smw_session_user', JSON.stringify(found));

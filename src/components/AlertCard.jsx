@@ -34,8 +34,8 @@ export const AlertCard = ({ alert, onResolve }) => {
   };
 
   return (
-    <div className={`p-6 rounded-2xl border bg-white shadow-sm flex flex-col justify-between transition hover:shadow-md ${
-      status === 'open' ? 'border-red-200 bg-red-50/10' : 'border-gray-200'
+    <div className={`p-6 rounded-2xl border bg-lime-50 shadow-sm flex flex-col justify-between transition hover:shadow-md ${
+      status === 'open' ? 'border-red-200 bg-red-50/10' : 'border-lime-200'
     }`}>
       {/* Header */}
       <div>
@@ -58,7 +58,7 @@ export const AlertCard = ({ alert, onResolve }) => {
           </div>
         </div>
 
-        <h4 className="text-base font-bold text-gray-900 mb-1">{location_name}</h4>
+        <h3 className="text-base font-bold text-gray-900 mb-1">{location_name}</h3>
         <p className="text-gray-600 text-sm mb-4 font-medium">{message}</p>
       </div>
 
@@ -90,7 +90,7 @@ export const AlertCard = ({ alert, onResolve }) => {
         {status === 'open' && (
           <button
             onClick={() => onResolve(id)}
-            className="w-full inline-flex items-center justify-center space-x-1 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl text-xs font-bold tracking-wide transition shadow-sm hover:shadow-md"
+            className="w-full inline-flex items-center justify-center space-x-1 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold tracking-wide transition shadow-sm hover:shadow-md"
           >
             <CheckCircle2 className="h-4 w-4" />
             <span>Resolve Alert</span>

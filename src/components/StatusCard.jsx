@@ -33,7 +33,7 @@ export const StatusCard = ({ label, count, icon: Icon, type }) => {
   return (
     <div className={`p-6 rounded-2xl border shadow-sm flex items-center justify-between transition hover:shadow-md ${currentStyle.bg}`}>
       <div>
-        <p className={`text-sm font-semibold uppercase tracking-wider ${currentStyle.text}`}>{label}</p>
+        <p className={`text-sm font-semibold tracking-wide ${currentStyle.text}`}>{label}</p>
         <p className={`text-4xl font-extrabold mt-2 ${currentStyle.countText}`}>{count}</p>
       </div>
       <div className={`p-4 rounded-xl ${currentStyle.iconBg}`}>

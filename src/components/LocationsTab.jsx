@@ -42,6 +42,9 @@ export const LocationsTab = ({ selectedLocId, clearSelectedLocId }) => {
   const [reportImageUrl, setReportImageUrl] = useState('');
   const [reportLoading, setReportLoading] = useState(false);
   const [reportError, setReportError] = useState('');
+  const [monitoringType, setMonitoringType] = useState('dustbin'); // 'dustbin' or 'room'
+  const [fillPercentage, setFillPercentage] = useState(0); // 0 to 100
+  const [roomCondition, setRoomCondition] = useState('clean'); // 'clean' or 'dirty'
 
   const loadLocationsList = async () => {
     try {
@@ -73,6 +76,9 @@ export const LocationsTab = ({ selectedLocId, clearSelectedLocId }) => {
     setShowReportForm(false);
     setReportObservation('');
     setReportImageUrl('');
+    setMonitoringType('dustbin');
+    setFillPercentage(0);
+    setRoomCondition('clean');
     
     try {
       const loc = await fetchLocationById(locId);
@@ -187,12 +193,39 @@ export const LocationsTab = ({ selectedLocId, clearSelectedLocId }) => {
       return;
     }
 
+    // Calculate status and format observation string according to the Decision Tree
+    let computedStatus = 'normal';
+    let summaryPrefix = '';
+
+    if (monitoringType === 'dustbin') {
+      const pct = Number(fillPercentage);
+      if (pct <= 50) {
+        computedStatus = 'normal';
+      } else if (pct <= 80) {
+        computedStatus = 'attention';
+      } else {
+        computedStatus = 'critical';
+      }
+      summaryPrefix = `[Dustbin: ${pct}% Full]`;
+    } else {
+      if (roomCondition === 'clean') {
+        computedStatus = 'normal';
+      } else {
+        computedStatus = 'critical';
+      }
+      summaryPrefix = `[Room: ${roomCondition === 'clean' ? 'Clean' : 'Dirty'}]`;
+    }
+
+    const finalObservation = reportObservation.trim()
+      ? `${summaryPrefix} - ${reportObservation.trim()}`
+      : summaryPrefix;
+
     try {
       await submitUpdate({
         location_id: activeLoc.id,
         user_id: user.id,
-        status: reportStatus,
-        observation: reportObservation,
+        status: computedStatus,
+        observation: finalObservation,
         image_url: reportImageUrl
       });
 
@@ -254,7 +287,7 @@ export const LocationsTab = ({ selectedLocId, clearSelectedLocId }) => {
       )}
 
       {/* Search and Filters */}
-      <div className="flex flex-col md:flex-row gap-4 bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
+      <div className="flex flex-col md:flex-row gap-4 bg-lime-50 p-4 rounded-2xl border border-lime-200 shadow-sm">
         <div className="flex-1 relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
             <Search className="h-4.5 w-4.5" />
@@ -284,7 +317,7 @@ export const LocationsTab = ({ selectedLocId, clearSelectedLocId }) => {
 
       {/* Grid view */}
       {filteredLocations.length === 0 ? (
-        <div className="bg-white border border-gray-200 p-12 rounded-2xl text-center">
+        <div className="bg-lime-50 border border-lime-200 p-12 rounded-2xl text-center">
           <p className="text-gray-400 font-bold text-lg">No Locations Found</p>
         </div>
       ) : (
@@ -293,7 +326,7 @@ export const LocationsTab = ({ selectedLocId, clearSelectedLocId }) => {
             <div 
               key={loc.id} 
               onClick={() => handleOpenDetails(loc.id)}
-              className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition duration-200 cursor-pointer overflow-hidden flex flex-col justify-between"
+              className="bg-lime-50 rounded-2xl border border-lime-200 shadow-sm hover:shadow-md transition duration-200 cursor-pointer overflow-hidden flex flex-col justify-between"
             >
               <div className="p-6">
                 <div className="flex justify-between items-start mb-3">
@@ -323,7 +356,7 @@ export const LocationsTab = ({ selectedLocId, clearSelectedLocId }) => {
       {/* DETAILS SLIDE-OVER DRAWER */}
       {activeLoc && (
         <div className="fixed inset-0 z-40 overflow-hidden flex justify-end bg-slate-900/60 backdrop-blur-xs">
-          <div className="w-full max-w-lg bg-white h-full flex flex-col shadow-2xl relative animate-in slide-in-from-right duration-200">
+          <div className="w-full max-w-lg bg-lime-50 h-full flex flex-col shadow-2xl relative animate-in slide-in-from-right duration-200">
             {/* Close button */}
             <button
               onClick={() => setActiveLoc(null)}
@@ -371,7 +404,7 @@ export const LocationsTab = ({ selectedLocId, clearSelectedLocId }) => {
                         <>
                           <button
                             onClick={() => { setIsEditing(true); setShowReportForm(false); }}
-                            className="inline-flex items-center space-x-1 px-3 py-2 bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 rounded-xl text-xs font-bold transition"
+                            className="inline-flex items-center space-x-1 px-3 py-2 bg-lime-100 hover:bg-lime-200/50 border border-lime-200 text-gray-700 rounded-xl text-xs font-bold transition"
                           >
                             <Edit3 className="h-4 w-4" />
                             <span>Edit</span>
@@ -438,32 +471,137 @@ export const LocationsTab = ({ selectedLocId, clearSelectedLocId }) => {
 
                     {reportError && <div className="text-xs text-red-650 bg-red-50 p-2.5 rounded-lg">{reportError}</div>}
 
-                    {/* Radio Selectors */}
-                    <div className="grid grid-cols-3 gap-2">
-                      <label className={`p-2.5 rounded-xl border flex flex-col items-center justify-center text-center cursor-pointer transition ${
-                        reportStatus === 'normal' ? 'border-green-500 bg-green-50/20' : 'border-gray-200 hover:bg-gray-50'
-                      }`}>
-                        <input type="radio" name="rstatus" value="normal" checked={reportStatus === 'normal'} onChange={(e) => setReportStatus(e.target.value)} className="sr-only" />
-                        <CheckCircle2 className="h-5 w-5 mb-1 text-green-600" />
-                        <span className="text-xs font-bold">Normal</span>
-                      </label>
-
-                      <label className={`p-2.5 rounded-xl border flex flex-col items-center justify-center text-center cursor-pointer transition ${
-                        reportStatus === 'attention' ? 'border-amber-500 bg-amber-50/20' : 'border-gray-200 hover:bg-gray-50'
-                      }`}>
-                        <input type="radio" name="rstatus" value="attention" checked={reportStatus === 'attention'} onChange={(e) => setReportStatus(e.target.value)} className="sr-only" />
-                        <AlertCircle className="h-5 w-5 mb-1 text-amber-600" />
-                        <span className="text-xs font-bold">Attention</span>
-                      </label>
-
-                      <label className={`p-2.5 rounded-xl border flex flex-col items-center justify-center text-center cursor-pointer transition ${
-                        reportStatus === 'critical' ? 'border-red-500 bg-red-50/20' : 'border-gray-200 hover:bg-gray-50'
-                      }`}>
-                        <input type="radio" name="rstatus" value="critical" checked={reportStatus === 'critical'} onChange={(e) => setReportStatus(e.target.value)} className="sr-only" />
-                        <AlertTriangle className="h-5 w-5 mb-1 text-red-600" />
-                        <span className="text-xs font-bold">Critical</span>
-                      </label>
+                    {/* Monitoring Type Selection */}
+                    <div>
+                      <label className="block text-[10px] uppercase font-extrabold text-gray-500 mb-1.5">Select Monitoring Type</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setMonitoringType('dustbin')}
+                          className={`p-2.5 rounded-xl border flex items-center justify-center space-x-2 transition font-bold text-xs ${
+                            monitoringType === 'dustbin'
+                              ? 'border-green-600 bg-green-50 text-green-700'
+                              : 'border-lime-200 bg-lime-50/50 text-gray-600 hover:bg-lime-100/50'
+                          }`}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          <span>Dustbin</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setMonitoringType('room')}
+                          className={`p-2.5 rounded-xl border flex items-center justify-center space-x-2 transition font-bold text-xs ${
+                            monitoringType === 'room'
+                              ? 'border-green-600 bg-green-50 text-green-700'
+                              : 'border-lime-200 bg-lime-50/50 text-gray-600 hover:bg-lime-100/50'
+                          }`}
+                        >
+                          <Building className="h-4 w-4" />
+                          <span>Room / Other Places</span>
+                        </button>
+                      </div>
                     </div>
+
+                    {/* Conditional Input based on Type */}
+                    {monitoringType === 'dustbin' ? (
+                      <div className="space-y-2 p-3 bg-lime-100/30 rounded-xl border border-lime-200/50">
+                        <div className="flex justify-between items-center text-xs font-bold text-gray-700">
+                          <span>Enter Fill Percentage</span>
+                          <span className="px-2 py-0.5 bg-lime-200 text-lime-800 rounded-md font-black">{fillPercentage}%</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={fillPercentage}
+                          onChange={(e) => setFillPercentage(Number(e.target.value))}
+                          className="w-full h-1.5 bg-lime-200 rounded-lg appearance-none cursor-pointer accent-green-600"
+                        />
+                        <div className="relative h-3.5 text-[9px] text-gray-400 font-bold">
+                          <span className="absolute left-0">0%</span>
+                          <span className="absolute left-1/2 -translate-x-1/2">50%</span>
+                          <span className="absolute left-[80%] -translate-x-1/2">80%</span>
+                          <span className="absolute right-0">100%</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-2 p-3 bg-lime-100/30 rounded-xl border border-lime-200/50">
+                        <label className="block text-xs font-bold text-gray-700 mb-1">Select Condition</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setRoomCondition('clean')}
+                            className={`py-2 px-3 rounded-lg border text-xs font-bold transition ${
+                              roomCondition === 'clean'
+                                ? 'border-green-500 bg-green-50 text-green-700'
+                                : 'border-lime-200 bg-lime-50/30 text-gray-600 hover:bg-lime-100/30'
+                            }`}
+                          >
+                            Clean
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setRoomCondition('dirty')}
+                            className={`py-2 px-3 rounded-lg border text-xs font-bold transition ${
+                              roomCondition === 'dirty'
+                                ? 'border-red-500 bg-red-50 text-red-700'
+                                : 'border-lime-200 bg-lime-50/30 text-gray-600 hover:bg-lime-100/30'
+                            }`}
+                          >
+                            Dirty
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Live Decision Tree Status Card */}
+                    {(() => {
+                      let statusVal = 'normal';
+                      let actionVal = 'No Action Required';
+                      let cardColor = 'border-green-200 bg-green-50/40 text-green-800';
+                      let Icon = CheckCircle2;
+
+                      if (monitoringType === 'dustbin') {
+                        if (fillPercentage <= 50) {
+                          statusVal = 'normal';
+                          actionVal = 'No Action Required';
+                          cardColor = 'border-green-200 bg-green-50/40 text-green-800';
+                          Icon = CheckCircle2;
+                        } else if (fillPercentage <= 80) {
+                          statusVal = 'attention';
+                          actionVal = 'Notify Staff';
+                          cardColor = 'border-amber-200 bg-amber-50/40 text-amber-800';
+                          Icon = AlertCircle;
+                        } else {
+                          statusVal = 'critical';
+                          actionVal = 'Immediate Alert';
+                          cardColor = 'border-red-200 bg-red-50/40 text-red-800';
+                          Icon = AlertTriangle;
+                        }
+                      } else {
+                        if (roomCondition === 'clean') {
+                          statusVal = 'normal';
+                          actionVal = 'No Action Required';
+                          cardColor = 'border-green-200 bg-green-50/40 text-green-800';
+                          Icon = CheckCircle2;
+                        } else {
+                          statusVal = 'critical';
+                          actionVal = 'Notify Admin & Assign Cleaning';
+                          cardColor = 'border-red-200 bg-red-50/40 text-red-800';
+                          Icon = AlertTriangle;
+                        }
+                      }
+
+                      return (
+                        <div className={`p-3 rounded-xl border flex items-center space-x-3 text-xs ${cardColor}`}>
+                          <Icon className="h-5 w-5 flex-shrink-0" />
+                          <div className="flex-1">
+                            <div className="font-extrabold uppercase tracking-wide text-[10px]">Calculated Status: {statusVal}</div>
+                            <div className="font-bold text-[11px] mt-0.5">Decision: {actionVal}</div>
+                          </div>
+                        </div>
+                      );
+                    })()}
 
                     {/* Notes */}
                     <div>
@@ -574,7 +712,7 @@ export const LocationsTab = ({ selectedLocId, clearSelectedLocId }) => {
       {/* ADD LOCATION MODAL */}
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative">
+          <div className="bg-lime-50 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative">
             <button
               onClick={() => setIsAddModalOpen(false)}
               className="absolute top-4 right-4 p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 transition"

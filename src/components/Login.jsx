@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Trash2, Key, Mail, AlertCircle, Info } from 'lucide-react';
+import logo from '../assets/logo.png';
 
 export const Login = () => {
   const [email, setEmail] = useState('');
@@ -34,15 +35,15 @@ export const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 sm:p-10 rounded-3xl border border-gray-150 shadow-lg">
+    <div className="min-h-screen bg-green-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 bg-lime-50 p-8 sm:p-10 rounded-3xl border border-lime-200 shadow-lg">
         {/* Header Logo */}
         <div className="text-center">
-          <div className="mx-auto h-12 w-12 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center">
-            <Trash2 className="h-7 w-7" />
+          <div className="mx-auto h-20 w-20 flex items-center justify-center">
+            <img src={logo} alt="Smart Waste Monitor Logo" className="h-full w-full object-contain" />
           </div>
-          <h2 className="mt-4 text-3xl font-black text-gray-950 tracking-tight">SmartWaste Login</h2>
-          <p className="mt-1.5 text-sm text-gray-500 font-medium">Campus Waste Monitoring & Management</p>
+          <h2 className="mt-4 text-3xl font-black text-gray-950 tracking-tight">Smart Waste Monitor</h2>
+          <p className="mt-1.5 text-sm text-gray-500 font-medium">Waste Monitoring & Management</p>
         </div>
 
         {/* Info Banner */}
@@ -55,7 +56,7 @@ export const Login = () => {
             <button
               type="button"
               onClick={() => fillCredentials('admin')}
-              className="bg-white hover:bg-green-100/50 p-2 rounded-lg border border-green-200 text-left transition font-semibold"
+              className="bg-lime-100 hover:bg-lime-200/60 p-2 rounded-lg border border-lime-300 text-left transition font-semibold"
             >
               <span className="block font-bold text-green-700">Admin User:</span>
               admin@campus.edu (admin123)
@@ -63,7 +64,7 @@ export const Login = () => {
             <button
               type="button"
               onClick={() => fillCredentials('staff')}
-              className="bg-white hover:bg-green-100/50 p-2 rounded-lg border border-green-200 text-left transition font-semibold"
+              className="bg-lime-100 hover:bg-lime-200/60 p-2 rounded-lg border border-lime-300 text-left transition font-semibold"
             >
               <span className="block font-bold text-green-700">Staff User:</span>
               staff@campus.edu (staff123)

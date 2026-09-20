@@ -6,6 +6,8 @@ import Login from './components/Login';
 import DashboardTab from './components/DashboardTab';
 import LocationsTab from './components/LocationsTab';
 import AlertsTab from './components/AlertsTab';
+import AnalyticsTab from './components/AnalyticsTab';
+import AdminTab from './components/AdminTab';
 
 const AppContent = () => {
   const { user, loading } = useAuth();
@@ -23,7 +25,7 @@ const AppContent = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-green-50">
         <div className="flex flex-col items-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
           <p className="mt-4 text-gray-500 font-bold text-sm">Smart Waste Monitor Loading...</p>
@@ -38,7 +40,7 @@ const AppContent = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-green-50">
       {/* Shared Nav Bar */}
       <Navbar onNavigateTab={setActiveTab} />
       
@@ -62,6 +64,8 @@ const AppContent = () => {
             />
           )}
           {activeTab === 'alerts' && <AlertsTab />}
+          {activeTab === 'analytics' && <AnalyticsTab />}
+          {activeTab === 'admin' && <AdminTab />}
         </main>
       </div>
     </div>
