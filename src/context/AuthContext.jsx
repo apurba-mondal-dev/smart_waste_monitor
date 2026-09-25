@@ -75,7 +75,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (email, password) => {
-    setLoading(true);
+    // NOTE: we intentionally do NOT call setLoading(true) here.
+    // Doing so unmounts <Login /> (which shows the global spinner) and
+    // resets its local state — wiping out any error message on failure.
+    // The Login component manages its own button spinner via loadingForm.
     try {
       if (isMock) {
         // Authenticate with mock profiles
@@ -96,7 +99,6 @@ export const AuthProvider = ({ children }) => {
           if (password === expectedPassword) {
             setUser(found);
             sessionStorage.setItem('smw_session_user', JSON.stringify(found));
-            setLoading(false);
             return { success: true };
           }
         }
@@ -110,7 +112,6 @@ export const AuthProvider = ({ children }) => {
       // Profile is fetched in onAuthStateChange
       return { success: true };
     } catch (err) {
-      setLoading(false);
       return { success: false, error: err.message };
     }
   };

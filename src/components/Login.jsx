@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Trash2, Key, Mail, AlertCircle, Info } from 'lucide-react';
+import { Key, Mail, AlertCircle } from 'lucide-react';
 import logo from '../assets/logo.png';
 
 export const Login = () => {
@@ -8,6 +8,7 @@ export const Login = () => {
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [loadingForm, setLoadingForm] = useState(false);
+  const [shake, setShake] = useState(false);
 
   const { login } = useAuth();
 
@@ -20,17 +21,9 @@ export const Login = () => {
     setLoadingForm(false);
 
     if (!result.success) {
-      setErrorMsg(result.error || 'Authentication failed. Please check credentials.');
-    }
-  };
-
-  const fillCredentials = (type) => {
-    if (type === 'admin') {
-      setEmail('admin@campus.edu');
-      setPassword('admin123');
-    } else {
-      setEmail('staff@campus.edu');
-      setPassword('staff123');
+      setErrorMsg('Incorrect email or password. Please try again.');
+      setShake(true);
+      setTimeout(() => setShake(false), 600);
     }
   };
 
@@ -46,42 +39,19 @@ export const Login = () => {
           <p className="mt-1.5 text-sm text-gray-500 font-medium">Waste Monitoring & Management</p>
         </div>
 
-        {/* Info Banner */}
-        <div className="bg-green-50 border border-green-200 text-green-800 p-4 rounded-xl text-xs space-y-2">
-          <div className="flex items-center space-x-1.5 font-bold">
-            <Info className="h-4 w-4 text-green-600" />
-            <span>Local Mock Testing Credentials:</span>
-          </div>
-          <div className="grid grid-cols-2 gap-2 text-[11px]">
-            <button
-              type="button"
-              onClick={() => fillCredentials('admin')}
-              className="bg-lime-100 hover:bg-lime-200/60 p-2 rounded-lg border border-lime-300 text-left transition font-semibold"
-            >
-              <span className="block font-bold text-green-700">Admin User:</span>
-              admin@campus.edu (admin123)
-            </button>
-            <button
-              type="button"
-              onClick={() => fillCredentials('staff')}
-              className="bg-lime-100 hover:bg-lime-200/60 p-2 rounded-lg border border-lime-300 text-left transition font-semibold"
-            >
-              <span className="block font-bold text-green-700">Staff User:</span>
-              staff@campus.edu (staff123)
-            </button>
-          </div>
-        </div>
-
         {errorMsg && (
-          <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl flex items-start space-x-2 text-sm">
+          <div className="bg-red-50 border-2 border-red-400 text-red-700 p-4 rounded-xl flex items-start space-x-3 text-sm animate-pulse-once">
             <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
-            <span>{errorMsg}</span>
+            <div>
+              <p className="font-bold">Login Failed</p>
+              <p className="text-red-600 mt-0.5">{errorMsg}</p>
+            </div>
           </div>
         )}
 
         {/* Login Form */}
         <form className="space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
+          <div className={`space-y-4 ${shake ? 'animate-[shake_0.5s_ease-in-out]' : ''}`}>
             <div>
               <label className="block text-xs uppercase font-extrabold text-gray-500 tracking-wider mb-2">
                 Email Address
@@ -94,8 +64,12 @@ export const Login = () => {
                   type="email"
                   required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-600 font-medium transition"
+                  onChange={(e) => { setEmail(e.target.value); setErrorMsg(''); }}
+                  className={`block w-full pl-11 pr-4 py-3 bg-gray-50 border rounded-xl text-gray-900 focus:outline-none focus:ring-2 font-medium transition ${
+                    errorMsg
+                      ? 'border-red-400 focus:ring-red-500/20 focus:border-red-500'
+                      : 'border-gray-200 focus:ring-green-500/20 focus:border-green-600'
+                  }`}
                   placeholder="name@campus.edu"
                 />
               </div>
@@ -113,8 +87,12 @@ export const Login = () => {
                   type="password"
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-600 font-medium transition"
+                  onChange={(e) => { setPassword(e.target.value); setErrorMsg(''); }}
+                  className={`block w-full pl-11 pr-4 py-3 bg-gray-50 border rounded-xl text-gray-900 focus:outline-none focus:ring-2 font-medium transition ${
+                    errorMsg
+                      ? 'border-red-400 focus:ring-red-500/20 focus:border-red-500'
+                      : 'border-gray-200 focus:ring-green-500/20 focus:border-green-600'
+                  }`}
                   placeholder="••••••••"
                 />
               </div>
