@@ -60,7 +60,7 @@ export const AuthProvider = ({ children }) => {
         .single();
 
       if (error) {
-        console.warn('Profile not found, creating a default profile', error);
+        if (import.meta.env.DEV) console.warn('Profile not found, creating a default profile', error);
         // Fallback or create profile if not exists
         const defaultProfile = { id: uid, email, full_name: email.split('@')[0], role: 'staff' };
         setUser(defaultProfile);
@@ -68,7 +68,7 @@ export const AuthProvider = ({ children }) => {
         setUser(data);
       }
     } catch (err) {
-      console.error('Error fetching user profile', err);
+      if (import.meta.env.DEV) console.error('Error fetching user profile', err);
     } finally {
       setLoading(false);
     }

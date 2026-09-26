@@ -10,10 +10,21 @@ export const Login = () => {
   const [loadingForm, setLoadingForm] = useState(false);
   const [shake, setShake] = useState(false);
 
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [lockedUntil, setLockedUntil] = useState(null);
+
   const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Rate limiting check
+    if (lockedUntil && Date.now() < lockedUntil) {
+      const secsLeft = Math.ceil((lockedUntil - Date.now()) / 1000);
+      setErrorMsg(`Too many failed attempts. Please wait ${secsLeft}s before trying again.`);
+      return;
+    }
+
     setErrorMsg('');
     setLoadingForm(true);
 
@@ -21,9 +32,20 @@ export const Login = () => {
     setLoadingForm(false);
 
     if (!result.success) {
-      setErrorMsg('Incorrect email or password. Please try again.');
+      const newAttempts = failedAttempts + 1;
+      setFailedAttempts(newAttempts);
+      if (newAttempts >= 5) {
+        setLockedUntil(Date.now() + 60000);
+        setErrorMsg('Too many failed attempts. Please wait 60 seconds before trying again.');
+      } else {
+        const remaining = 5 - newAttempts;
+        setErrorMsg(`Incorrect email or password. ${remaining} attempt${remaining !== 1 ? 's' : ''} remaining.`);
+      }
       setShake(true);
       setTimeout(() => setShake(false), 600);
+    } else {
+      setFailedAttempts(0);
+      setLockedUntil(null);
     }
   };
 
@@ -101,7 +123,7 @@ export const Login = () => {
 
           <button
             type="submit"
-            disabled={loadingForm}
+            disabled={loadingForm || (lockedUntil && Date.now() < lockedUntil)}
             className="w-full flex justify-center py-3.5 px-4 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-extrabold tracking-wider uppercase transition shadow-lg shadow-green-600/10 hover:shadow-xl disabled:opacity-50"
           >
             {loadingForm ? (

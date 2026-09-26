@@ -3,10 +3,7 @@ const KEY_UPDATES = 'smw_updates';
 const KEY_ALERTS = 'smw_alerts';
 const KEY_PROFILES = 'smw_profiles';
 
-const initialProfiles = [
-  { id: 'user-admin', email: 'admin@campus.edu', full_name: 'Admin User', role: 'admin', created_at: new Date(Date.now() - 86400000 * 20).toISOString() },
-  { id: 'user-staff', email: 'staff@campus.edu', full_name: 'Staff Member', role: 'staff', created_at: new Date(Date.now() - 86400000 * 20).toISOString() }
-];
+const initialProfiles = [];
 
 const initialLocations = [
   { id: 'loc-1', name: 'Main Canteen Area', building: 'Zone A - Student Center', description: 'Main dining hall waste bins. High volume area.', current_status: 'normal', last_checked: new Date(Date.now() - 3600000 * 2).toISOString(), created_at: new Date(Date.now() - 86400000 * 15).toISOString() },

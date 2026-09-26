@@ -25,7 +25,7 @@ export const DashboardTab = ({ onSelectLocation, onNavigateTab }) => {
       setAlerts(alts);
       setActivities(acts.slice(0, 5)); // Keep only latest 5
     } catch (err) {
-      console.error('Error loading dashboard data', err);
+      if (import.meta.env.DEV) console.error('Error loading dashboard data', err);
       setError('Failed to fetch real-time dashboard data.');
     } finally {
       setLoading(false);
@@ -42,8 +42,8 @@ export const DashboardTab = ({ onSelectLocation, onNavigateTab }) => {
       await resolveAlert(alertId, user.id);
       await loadDashboardData();
     } catch (err) {
-      console.error('Error resolving alert', err);
-      alert('Could not resolve alert: ' + err.message);
+      if (import.meta.env.DEV) console.error(err);
+      setError('Failed to resolve alert. Please try again.');
     }
   };
 

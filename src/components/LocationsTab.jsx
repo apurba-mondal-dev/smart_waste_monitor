@@ -51,7 +51,7 @@ export const LocationsTab = ({ selectedLocId, clearSelectedLocId }) => {
       const data = await fetchLocations();
       setLocations(data);
     } catch (err) {
-      console.error(err);
+      if (import.meta.env.DEV) console.error(err);
       setError('Failed to fetch campus locations.');
     } finally {
       setLoading(false);
@@ -92,7 +92,7 @@ export const LocationsTab = ({ selectedLocId, clearSelectedLocId }) => {
       setEditDescription(loc.description || '');
       setReportStatus(loc.current_status);
     } catch (err) {
-      console.error(err);
+      if (import.meta.env.DEV) console.error(err);
       alert('Failed to load location details.');
     } finally {
       setDetailsLoading(false);
@@ -112,9 +112,9 @@ export const LocationsTab = ({ selectedLocId, clearSelectedLocId }) => {
 
     try {
       await createLocation({
-        name: newName,
-        building: newBuilding,
-        description: newDescription,
+        name: newName.trim(),
+        building: newBuilding.trim(),
+        description: newDescription.trim(),
       });
 
       setNewName('');
@@ -123,8 +123,8 @@ export const LocationsTab = ({ selectedLocId, clearSelectedLocId }) => {
       setIsAddModalOpen(false);
       await loadLocationsList();
     } catch (err) {
-      console.error(err);
-      setAddError('Failed to create location: ' + err.message);
+      if (import.meta.env.DEV) console.error(err);
+      setAddError('Failed to create location. Please try again.');
     } finally {
       setAddLoading(false);
     }
@@ -137,16 +137,16 @@ export const LocationsTab = ({ selectedLocId, clearSelectedLocId }) => {
 
     try {
       const updated = await updateLocation(activeLoc.id, {
-        name: editName,
-        building: editBuilding,
-        description: editDescription
+        name: editName.trim(),
+        building: editBuilding.trim(),
+        description: editDescription.trim()
       });
       setActiveLoc(updated);
       setIsEditing(false);
       await loadLocationsList(); // Refresh parent grid
     } catch (err) {
-      console.error(err);
-      setEditError('Failed to update details: ' + err.message);
+      if (import.meta.env.DEV) console.error(err);
+      setEditError('Failed to update location. Please try again.');
     } finally {
       setEditLoading(false);
     }
@@ -162,14 +162,20 @@ export const LocationsTab = ({ selectedLocId, clearSelectedLocId }) => {
       setActiveLoc(null);
       await loadLocationsList();
     } catch (err) {
-      console.error(err);
-      alert('Failed to delete: ' + err.message);
+      if (import.meta.env.DEV) console.error(err);
+      alert('Failed to delete location. Please try again.');
     }
   };
 
   const handleImageFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+      if (!allowedTypes.includes(file.type)) {
+        setReportError('Only JPEG, PNG, WebP, or GIF images are allowed.');
+        e.target.value = '';
+        return;
+      }
       if (file.size > 2 * 1024 * 1024) {
         setReportError('Image size should be less than 2MB.');
         return;
@@ -237,8 +243,8 @@ export const LocationsTab = ({ selectedLocId, clearSelectedLocId }) => {
       await handleOpenDetails(activeLoc.id);
       await loadLocationsList(); // reload parent grid list
     } catch (err) {
-      console.error(err);
-      setReportError('Failed to log report: ' + err.message);
+      if (import.meta.env.DEV) console.error(err);
+      setReportError('Failed to submit report. Please try again.');
     } finally {
       setReportLoading(false);
     }

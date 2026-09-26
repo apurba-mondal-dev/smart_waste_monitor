@@ -17,6 +17,8 @@ export const fetchMembers = async () => {
 };
 
 export const createMember = async ({ full_name, email, role, password }) => {
+  full_name = full_name.trim();
+  email = email.trim().toLowerCase();
   if (isMock) {
     const data = getMockData();
 

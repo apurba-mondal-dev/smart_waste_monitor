@@ -10,7 +10,7 @@ import AnalyticsTab from './components/AnalyticsTab';
 import AdminTab from './components/AdminTab';
 
 const AppContent = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, isAdmin } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [selectedLocId, setSelectedLocId] = useState(null);
 
@@ -65,7 +65,7 @@ const AppContent = () => {
           )}
           {activeTab === 'alerts' && <AlertsTab />}
           {activeTab === 'analytics' && <AnalyticsTab />}
-          {activeTab === 'admin' && <AdminTab />}
+          {activeTab === 'admin' && isAdmin && <AdminTab />}
         </main>
       </div>
     </div>

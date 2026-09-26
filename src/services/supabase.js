@@ -6,11 +6,13 @@ const supabaseServiceKey = import.meta.env.VITE_SUPABASE_SERVICE_KEY?.trim()
 
 export const isMock = !supabaseUrl || !supabaseAnonKey
 
-if (isMock) {
-  console.log('%cSmart Waste Monitor: Running in Local Mock Mode (persistent using LocalStorage)', 'color: #22c55e; font-weight: bold; font-size: 14px;');
-  console.log('Missing env vars:', { hasUrl: !!supabaseUrl, hasAnonKey: !!supabaseAnonKey });
-} else {
-  console.log('%cSmart Waste Monitor: Connecting to Supabase', 'color: #3b82f6; font-weight: bold; font-size: 14px;');
+if (import.meta.env.DEV) {
+  console.log(
+    isMock
+      ? '%cSmart Waste Monitor: Running in Local Mock Mode'
+      : '%cSmart Waste Monitor: Connecting to Supabase',
+    isMock ? 'color:#22c55e;font-weight:bold' : 'color:#3b82f6;font-weight:bold'
+  );
 }
 
 // Standard client (anon key) — used for all normal queries & auth
